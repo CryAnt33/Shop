@@ -33,9 +33,9 @@ namespace Shop.Web
 
             services.AddTransient<SeedDb>();
 
-            //services.AddScoped<IRepository, Repository>();//injecta el repositorio "Repository"
+            services.AddScoped<IRepository, Repository>();//injecta el repositorio "Repository"
 
-            services.AddScoped<IRepository, MockRepository>();//injecta el repositorio "MockRepository"
+            //services.AddScoped<IRepository, MockRepository>();//injecta el repositorio "MockRepository"
 
             services.Configure<CookiePolicyOptions>(options =>
             {
