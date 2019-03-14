@@ -29,6 +29,9 @@ public class Product
 
         [DisplayFormat(DataFormatString = "{0:N2}", ApplyFormatInEditMode = false)]
         public double Stock { get; set; }
+
+        public User User { get; set; }//relacion con productos y usuario, 1 a muchos
+
     }
 
 }
