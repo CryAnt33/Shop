@@ -5,7 +5,7 @@ namespace Shop.Web.Data.Entities
     using System;
     using System.ComponentModel.DataAnnotations;
 
-public class Product
+public class Product : IEntity
     {
         public int Id { get; set; }
         [MaxLength(50, ErrorMessage = "The field {0} only can contain a maximum {1} characters")]

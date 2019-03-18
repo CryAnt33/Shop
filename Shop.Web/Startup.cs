@@ -15,8 +15,9 @@ namespace Shop.Web
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
-    using Shop.Web.Data;
-    using Shop.Web.Data.Entities;
+    using Data;
+    using Data.Entities;
+    using Helpers;
 
     public class Startup
     {
@@ -40,7 +41,8 @@ namespace Shop.Web
                 cfg.Password.RequireUppercase = false;
                 cfg.Password.RequiredLength = 6;
             })
-            .AddEntityFrameworkStores<DataContext>();
+            .AddEntityFrameworkStores<DataContext>();
+
 
             services.AddDbContext<DataContext>(cfg =>
             {
@@ -49,7 +51,9 @@ namespace Shop.Web
 
             services.AddTransient<SeedDb>();
 
-            services.AddScoped<IRepository, Repository>();//injecta el repositorio "Repository"
+            services.AddScoped<IProductRepository, ProductRepository>();//injecta el repositorio "Repository"
+            services.AddScoped<ICountryRepository, CountryRepository>();//injecta el repositorio "Repository"
+            services.AddScoped<IUserHelper, UseHelper>();//injecta el repositorio "Repository"
 
             //services.AddScoped<IRepository, MockRepository>();//injecta el repositorio "MockRepository"
 

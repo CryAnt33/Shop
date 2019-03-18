@@ -1,55 +1,47 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using Shop.Web.Data;
-using Shop.Web.Data.Entities;
-
-namespace Shop.Web.Controllers
+﻿namespace Shop.Web.Controllers
 {
+    using Microsoft.AspNetCore.Mvc;
+    using Microsoft.EntityFrameworkCore;
+    using Shop.Web.Data;
+    using Shop.Web.Data.Entities;
+    using Shop.Web.Helpers;
+    using System.Threading.Tasks;
+
     public class ProductsController : Controller
     {
-        private readonly DataContext _context;
-        private readonly IRepository repository;
-
-        public ProductsController(IRepository repository)
+        private readonly IProductRepository productRepository;
+        private readonly IUserHelper userHelper;
+        public ProductsController(IProductRepository productRepository, IUserHelper
+        userHelper)
         {
-            this.repository = repository;
+            this.productRepository = productRepository;
+            this.userHelper = userHelper;
         }
-
         // GET: Products
         public IActionResult Index()
         {
-            return View(this.repository.GetProducts());//nos extrae los productos de la DB a travez de la Interface
+            return View(productRepository.GetAll());
         }
-
         // GET: Products/Details/5
-        public IActionResult Details(int? id)
+        public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
             {
+
                 return NotFound();
             }
-
-            var product = this.repository.GetProduct(id.Value);
-                
+            Shop.Web.Data.Entities.Product product = await productRepository.GetByIdAsync(id.Value);
             if (product == null)
             {
                 return NotFound();
             }
-
             return View(product);
         }
-
         // GET: Products/Create
         public IActionResult Create()
         {
             return View();
         }
-
         // POST: Products/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -57,46 +49,46 @@ namespace Shop.Web.Controllers
         {
             if (ModelState.IsValid)
             {
-                this.repository.AddProduct(product);
-                await this.repository.SaveAllAsync();
-              return RedirectToAction(nameof(Index));
+                // TODO: Pending to change to: this.User.Identity.Name
+                product.User = await
+                userHelper.GetUserByEmailAsync("jzuluaga55@gmail.com");
+                await productRepository.CreateAsync(product);
+                return RedirectToAction(nameof(Index));
             }
             return View(product);
         }
-
         // GET: Products/Edit/5
-        public IActionResult Edit(int? id)
+        public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
             {
                 return NotFound();
             }
-
-            var product = this.repository.GetProduct(id.Value);
+            Shop.Web.Data.Entities.Product product = await productRepository.GetByIdAsync(id.Value);
             if (product == null)
             {
+
                 return NotFound();
             }
             return View(product);
         }
-
         // POST: Products/Edit/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, Product product)
+        public async Task<IActionResult> Edit(Product product)
         {
             if (ModelState.IsValid)
             {
                 try
                 {
-                    this.repository.UpdateProduct(product);
-                    await this.repository.SaveAllAsync();
+                    // TODO: Pending to change to: this.User.Identity.Name
+                    product.User = await
+                    userHelper.GetUserByEmailAsync("jzuluaga55@gmail.com");
+                    await productRepository.UpdateAsync(product);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!this.repository.ProductExists(product.Id))
+                    if (!await productRepository.ExistAsync(product.Id))
                     {
                         return NotFound();
                     }
@@ -109,36 +101,31 @@ namespace Shop.Web.Controllers
             }
             return View(product);
         }
-
         // GET: Products/Delete/5
-        public IActionResult Delete(int? id)
+        public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
             {
                 return NotFound();
             }
+            Shop.Web.Data.Entities.Product product = await productRepository.GetByIdAsync(id.Value);
 
-            var product = this.repository.GetProduct(id.Value);
-                
             if (product == null)
             {
                 return NotFound();
             }
-
             return View(product);
         }
-
         // POST: Products/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var product = this.repository.GetProduct(id);
-            this.repository.RemoveProduct(product);
-            await this.repository.SaveAllAsync();
+            Shop.Web.Data.Entities.Product product = await productRepository.GetByIdAsync(id);
+            await productRepository.DeleteAsync(product);
             return RedirectToAction(nameof(Index));
         }
-
-       
     }
 }
+
+
